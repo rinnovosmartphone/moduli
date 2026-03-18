@@ -429,14 +429,9 @@ async function uploadToDrive(pdfBlob,filename){
   try{
     const buf=await pdfBlob.arrayBuffer(),bytes=new Uint8Array(buf);
     let bin='';bytes.forEach(b=>bin+=String.fromCharCode(b));
-    const resPdf=await fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+    await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({pdf:btoa(bin),filename})});
-    const resPdfJson=await resPdf.json();
-    if(resPdfJson.success){
-      if(el)el.innerHTML='<span style="color:var(--green)">&#10003; PDF salvato su Drive</span>';
-    } else {
-      throw new Error(resPdfJson.error||'Errore salvataggio PDF');
-    }
+    if(el)el.innerHTML='<span style="color:var(--green)">&#10003; PDF salvato su Drive</span>';
   }catch(err){if(el)el.innerHTML=`<span style="color:var(--red)">&#10006; Errore Drive: ${err.message}</span>`;}
 }
 
@@ -511,8 +506,9 @@ async function inviaModulo(){
 async function salvaRigaRegistro(logData){
   const orario = new Date().toLocaleString('it-IT');
   try{
-    const resReg=await fetch(APPS_SCRIPT_URL, {
+    await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
+      mode: 'no-cors',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         soloRegistro: true,
@@ -526,8 +522,7 @@ async function salvaRigaRegistro(logData){
         orario: orario
       })
     });
-    const resRegJson=await resReg.json();
-    console.log('Registro:', JSON.stringify(resRegJson), '| Orario:', orario);
+    console.log('Registro inviato, orario:', orario);
   }catch(err){
     console.error('Errore salvaRigaRegistro:', err);
   }
